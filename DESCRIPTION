@@ -12,7 +12,7 @@ Description: This includes functions that rely on BirdFlowR and a BirdFlow
     would make it CRAN incompatible. 
     The initial motivation for a separate package was the calc_birdflow_mc()
     function, but others will likely be added over time.
-License: MIT + file
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
