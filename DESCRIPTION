@@ -1,0 +1,35 @@
+Package: BirdFlowExtras
+Type: Package
+Title: Extend BirdFlowR migration model functionality
+Version: 0.0.0.9001
+Authors@R: 
+    person("Ethan", "Plunkett",  email = "plunkett@umass.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-4405-2251"))
+Description: This includes functions that rely on BirdFlowR and a BirdFlow
+    model. They are in this second repository either because they are only 
+    likely to be useful to a subset of BirdFlowR users, or they depend on 
+    packages that are not on CRAN - in which case including them in BirdFlowR 
+    would make it CRAN incompatible. 
+    The initial motivation for a separate package was the calc_birdflow_mc()
+    function, but others will likely be added over time.
+License: MIT + file
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Suggests: 
+    BirdFlowModels,
+    spelling,
+    testthat (>= 3.0.0)
+Imports:
+    BirdFlowR,
+    MigConnectivity
+Remotes:
+    birdflow-science/BirdFlowModels,
+    birdflow-science/BirdFlowR,
+    SMBC-NZP/MigConnectivity
+URL: https://birdflow-science.github.io/BirdFlowExtras/, https://github.com/birdflow-science/BirdFlowExtras
+BugReports: https://github.com/birdflow-science/BirdFlowExtras/issue
+Language: en-US
+Depends: 
+    R (>= 3.5)
+Config/testthat/edition: 3
