@@ -53,7 +53,7 @@ calc_birdflow_mc <- function(bf, ...) {
   # same calculation, now for target_abun
   target_abun_prod <- target_abun %*% t(target_abun)
   mu_V <- sum(target_dist * target_abun_prod)
-  sd_V <- sqrt(sum((target_dist - mu_V)^2 * rarget_abun_prod))
+  sd_V <- sqrt(sum((target_dist - mu_V)^2 * target_abun_prod))
 
   sumWinRelN <- apply(psi, 2, "*", origin_abun)
   # these next two lines are problematic, the kronecker product creates too large a matrix.
