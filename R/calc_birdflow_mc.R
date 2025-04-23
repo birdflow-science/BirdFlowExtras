@@ -31,8 +31,9 @@ calc_birdflow_mc <- function(bf, ...) {
   origin_dist <- dist[origin_dm, origin_dm] # origin dynamic
   target_dist <- dist[target_dm, target_dm] # target dynamic
 
-  # Origin relative abundance
+  # Origin and destination relative abundance
   origin_abun <- get_distr(bf, origin_t)[origin_dm]
+  target_abun <- get_distr(bf, target_t)[target_dm]
 
   # Transition probabilities
   psi <- t(combine_transitions(bf, ...))
@@ -41,11 +42,23 @@ calc_birdflow_mc <- function(bf, ...) {
   stopifnot(isTRUE(all.equal(nrow(psi), sum(origin_dm))))
   stopifnot(isTRUE(all.equal(ncol(psi), sum(target_dm))))
 
-  # Calculate MC
-  mc <- MigConnectivity::calcMC(originDist = origin_dist,
-                                targetDist = target_dist,
-                                originRelAbund = origin_abun,
-                                psi = psi)
+  # matrix product to have all compbinations for two samples for origin_abun
+  # note that this outer product remains normalized, because origin_abun is normalized
+  origin_abun_prod <- origin_abun %*% t(origin_abun)
+  # mu_D effectively equals weighted.mean(origin_dist, origin_abun_prod)
+  mu_D <- sum(origin_dist * origin_abun_prod)
+  # SD in origin distance between any two given pixels
+  sd_D <- sqrt(sum((origin_dist - mu_D)^2 * origin_abun_prod))
 
-  return(mc)
+  # same calculation, now for target_abun
+  target_abun_prod <- target_abun %*% t(target_abun)
+  mu_V <- sum(target_dist * target_abun_prod)
+  sd_V <- sqrt(sum((target_dist - mu_V)^2 * rarget_abun_prod))
+
+  sumWinRelN <- apply(psi, 2, "*", origin_abun)
+  # these next two lines are problematic, the kronecker product creates too large a matrix.
+  M <- sumWinRelN %x% sumWinRelN
+  MC <- c((c(origin_dist - mu_D) / sd_D) %*% M %*% (c(target_dist - mu_V) / sd_V))
+
+  return(MC)
 }
