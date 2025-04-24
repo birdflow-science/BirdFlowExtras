@@ -15,7 +15,7 @@
 #' mc <- calc_birdflow_mc(bf, season = "prebreeding")
 #' print(mc)
 #'
-calc_birdflow_mc <- function(bf, cores = parallel::detectCores() - 1, ...) {
+calc_birdflow_mc_test <- function(bf, ...) {
 
   # Figure out time
   ts <- lookup_timestep_sequence(bf, ...)
@@ -59,10 +59,8 @@ calc_birdflow_mc <- function(bf, cores = parallel::detectCores() - 1, ...) {
   psi_abun <- apply(psi, 2, "*", origin_abun)
 
   # calculate MC
-  print("Starting MC calculation...")
-  MC=parallel::mclapply(1:dim(target_dist)[1],
-           function(j) (psi_abun[,j] %*% ((origin_dist - mu_D) / sd_D)) %*% psi_abun %*% ((target_dist[j,] - mu_V) / sd_V),
-           mc.cores=cores)
+  MC=sapply(1:dim(target_dist)[1],
+           function(j) (psi_abun[,j] %*% ((origin_dist - mu_D) / sd_D)) %*% psi_abun %*% ((target_dist[j,] - mu_V) / sd_V))
 
-  return(sum(unlist(MC)))
+  return(sum(MC))
 }
