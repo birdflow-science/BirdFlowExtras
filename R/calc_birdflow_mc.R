@@ -15,7 +15,7 @@
 #' mc <- calc_birdflow_mc(bf, season = "prebreeding")
 #' print(mc)
 #'
-calc_birdflow_mc <- function(bf, ...) {
+calc_birdflow_mc <- function(bf, cores = parallel::detectCores() - 1, ...) {
 
   # Figure out time
   ts <- lookup_timestep_sequence(bf, ...)
@@ -35,10 +35,8 @@ calc_birdflow_mc <- function(bf, ...) {
   origin_abun <- get_distr(bf, origin_t)[origin_dm]
   target_abun <- get_distr(bf, target_t)[target_dm]
 
-  print("Combining transitions...")
   # Transition probabilities
   psi <- t(combine_transitions(bf, ...))
-  print("Done")
 
   # Double check dimensions
   stopifnot(isTRUE(all.equal(nrow(psi), sum(origin_dm))))
@@ -61,14 +59,10 @@ calc_birdflow_mc <- function(bf, ...) {
   psi_abun <- apply(psi, 2, "*", origin_abun)
 
   # calculate MC
-  MC=0
   print("Starting MC calculation...")
+  MC=parallel::mclapply(1:dim(target_dist)[1],
+           function(j) (psi_abun[,j] %*% ((origin_dist - mu_D) / sd_D)) %*% psi_abun %*% ((target_dist[j,] - mu_V) / sd_V),
+           mc.cores=cores)
 
-  for(j in 1:dim(target_dist)[1]){
-    print(paste(j,"/",dim(origin_dist)[1]))
-    Delta_MC=(psi_abun[,j] %*% ((origin_dist - mu_D) / sd_D)) %*% psi_abun %*% ((target_dist[j,] - mu_V) / sd_V)
-    MC=MC+Delta_MC
-  }
-
-  return(MC)
+  return(sum(unlist(MC)))
 }
