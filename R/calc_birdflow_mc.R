@@ -64,6 +64,7 @@ calc_birdflow_mc <- function(bf, ...) {
   MC=0
   print("starting MC calculation...")
   for (i in 1:dim(origin_dist)[1]){
+    print(paste(i,"/",dim(origin_dist)[1]))
     for(j in 1:dim(target_dist)[1]){
       Delta_MC=psi_abun[i,j]*((origin_dist[,i] - mu_D) / sd_D) %*% psi_abun %*% ((target_dist[j,] - mu_V) / sd_V)
       MC=MC+Delta_MC
