@@ -55,10 +55,17 @@ calc_birdflow_mc <- function(bf, ...) {
   mu_V <- sum(target_dist * target_abun_prod)
   sd_V <- sqrt(sum((target_dist - mu_V)^2 * target_abun_prod))
 
-  sumWinRelN <- apply(psi, 2, "*", origin_abun)
-  # these next two lines are problematic, the kronecker product creates too large a matrix.
-  M <- sumWinRelN %x% sumWinRelN
-  MC <- c((c(origin_dist - mu_D) / sd_D) %*% M %*% (c(target_dist - mu_V) / sd_V))
+  # multiply transition matrix and relative abundance
+  psi_abun <- apply(psi, 2, "*", origin_abun)
+
+  # calculate MC
+  MC=0
+  for (i in 1:dim(origin_dist)[1]){
+    for(j in 1:dim(target_dist)[1]){
+      Delta_MC=psi_abun[i,j]*((origin_dist[,i] - mu_D) / sd_D) %*% psi_abun %*% ((target_dist[j,] - mu_V) / sd_V)
+      MC=MC+Delta_MC
+    }
+  }
 
   return(MC)
 }
