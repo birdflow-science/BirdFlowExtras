@@ -15,7 +15,7 @@
 #' mc <- calc_birdflow_mc(bf, season = "prebreeding")
 #' print(mc)
 #'
-calc_birdflow_mc_test <- function(bf, ...) {
+calc_birdflow_mc <- function(bf, ...) {
 
   # Figure out time
   ts <- lookup_timestep_sequence(bf, ...)
