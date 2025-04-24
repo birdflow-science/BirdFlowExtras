@@ -35,10 +35,10 @@ calc_birdflow_mc <- function(bf, ...) {
   origin_abun <- get_distr(bf, origin_t)[origin_dm]
   target_abun <- get_distr(bf, target_t)[target_dm]
 
-  print("combining transitions...")
+  print("Combining transitions...")
   # Transition probabilities
   psi <- t(combine_transitions(bf, ...))
-  print("done")
+  print("Done")
 
   # Double check dimensions
   stopifnot(isTRUE(all.equal(nrow(psi), sum(origin_dm))))
@@ -62,7 +62,7 @@ calc_birdflow_mc <- function(bf, ...) {
 
   # calculate MC
   MC=0
-  print("starting MC calculation...")
+  print("Starting MC calculation...")
   for (i in 1:dim(origin_dist)[1]){
     print(paste(i,"/",dim(origin_dist)[1]))
     for(j in 1:dim(target_dist)[1]){
