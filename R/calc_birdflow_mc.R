@@ -26,7 +26,7 @@ calc_birdflow_mc <- function(bf, ...) {
   origin_dm <- get_dynamic_mask(bf, origin_t) # origin dynamic cells
   target_dm <- get_dynamic_mask(bf, target_t) # target dynamic cells
 
-  # distance matricies
+  # distance matrices
   dist <- great_circle_distances(bf)  # all active cells
   origin_dist <- dist[origin_dm, origin_dm] # origin dynamic
   target_dist <- dist[target_dm, target_dm] # target dynamic
