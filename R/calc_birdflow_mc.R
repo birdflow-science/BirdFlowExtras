@@ -58,9 +58,12 @@ calc_birdflow_mc <- function(bf, ...) {
   # multiply transition matrix and relative abundance
   psi_abun <- apply(psi, 2, "*", origin_abun)
 
-  # calculate MC
-  MC=sapply(1:dim(target_dist)[1],
-           function(j) (psi_abun[,j] %*% ((origin_dist - mu_D) / sd_D)) %*% psi_abun %*% ((target_dist[j,] - mu_V) / sd_V))
+  # standardizing origin distance matrix
+  origin_std <- (origin_dist - mu_D) / sd_D
+  target_std <- (target_dist - mu_V) / sd_V
 
-  return(sum(MC))
+  # calculate MC
+  MC=sum(t(psi_abun) %*% origin_std %*% psi_abun * target_std)
+
+  return(MC)
 }
