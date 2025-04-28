@@ -16,7 +16,6 @@
 #' print(mc)
 #'
 calc_birdflow_mc <- function(bf, ...) {
-
   # Figure out time
   ts <- lookup_timestep_sequence(bf, ...)
   origin_t <- ts[1]
@@ -33,7 +32,9 @@ calc_birdflow_mc <- function(bf, ...) {
 
   # Origin and destination relative abundance
   origin_abun <- get_distr(bf, origin_t)[origin_dm]
-  target_abun <- get_distr(bf, target_t)[target_dm]
+  target_abun <- (origin_abun %*% psi)[1,]
+  # alternative for target_abun, basing on observed S&T distribution:
+  # target_abun <- get_distr(bf, target_t)[target_dm]
 
   # Transition probabilities
   psi <- t(combine_transitions(bf, ...))
@@ -56,7 +57,7 @@ calc_birdflow_mc <- function(bf, ...) {
   sd_V <- sqrt(sum((target_dist - mu_V)^2 * target_abun_prod))
 
   # multiply transition matrix and relative abundance
-  psi_abun <- apply(psi, 2, "*", origin_abun)
+  psi_abun <- psi * origin_abun
 
   # standardizing origin distance matrix
   origin_std <- (origin_dist - mu_D) / sd_D
