@@ -8,4 +8,4 @@ test_that("calc_birdflow_mc() produces consistent results", {
   # After:
   # 0.376294716863389, 463 milliseconds, max total memory   67.0 Mb
 
-}
+})
