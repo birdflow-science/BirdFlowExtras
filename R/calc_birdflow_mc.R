@@ -30,16 +30,12 @@ calc_birdflow_mc <- function(bf, ...) {
   origin_dist <- dist[origin_dm, origin_dm] # origin dynamic
   target_dist <- dist[target_dm, target_dm] # target dynamic
 
-  # Origin relative abundance
-  origin_abun <- get_distr(bf, origin_t)[origin_dm]
+  # Origin and target relative abundance from marginals
+  origin_abun <- get_distr(bf, origin_t, from_marginals = TRUE)[origin_dm]
+  target_abun <- get_distr(bf, target_t, from_marginals = TRUE)[target_dm]
 
   # Transition probabilities
   psi <- t(combine_transitions(bf, ...))
-
-  # Target relative abundance
-  # alternative for target_abun, basing on observed S&T distribution:
-  # target_abun <- get_distr(bf, target_t)[target_dm]
-  target_abun <- (origin_abun %*% psi)[1,]
 
   # Double check dimensions
   stopifnot(isTRUE(all.equal(nrow(psi), sum(origin_dm))))
