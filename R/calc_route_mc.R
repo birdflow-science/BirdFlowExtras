@@ -1,15 +1,30 @@
-#' Calculate migratory connectivity from BirdFlowR routes
+#' Calculate migratory connectivity from BirdFlowR routes.
 #'
-#' **WARNING** this function is experimental and new and likely to change
-#' a bunch.
+#' This function calculates migratory connectivity based on sample of routes
+#' objects sampled either from a BirdFlowR model or from observational track data.
+#'
+#' It calculates the migratory connectivity metric MC as defined in Cohen 2018.
+#' MC represents an abundance-weighted correlation that is calculated between the origin
+#' locations and target locations, taking into account all grid transitions for the
+#' specified time period.
+#'
+#' The route implementation does not correct for spatial sampling inbalances of the
+#' provided routes, i.e. the transition matrix is calculated directly from the route
+#' transitions.
+#'
+#' When sampling a high number of routes from a BirdFlow model, the output of
+#' [calc_route_mc()] will become asymptotically identical to the output of
+#' [calc_birdflow_mc()].
 #'
 #' @param rts Output from [BirdFlowR::route()]
 #' @param bf The BirdFlow model used to make `rts`
-#' @param exact logical. Whether to match route time steps exactly to period requested with `...` (TRUE)
-#'  or use the route's closest available time steps (FALSE).
+#' @param exact logical. Whether to match route time steps exactly to period
+#' requested with [BirdFlowR::lookup_timestep_sequence()] (TRUE)
+#' or use the route's closest available time steps (FALSE).
 #' @inheritDotParams BirdFlowR::lookup_timestep_sequence -x
 #' @return migratory connectivity estimated from the `rts` object.
 #' @export
+#' @seealso [calc_birdflow_mc()]
 #' @examples
 #' bf <- BirdFlowModels::amewoo
 #' # generate 100 synthetic routes
@@ -21,9 +36,15 @@
 #' # set exact to false to not enforce exact matches of route timestamps and
 #' # requested start and end weeks (in this example end week 30 is after the last
 #' # timestamp of the input routes):
-#' calc_route_mc_test(rts, bf, start=10, end=30, exact=FALSE)
+#' calc_route_mc(rts, bf, start=10, end=30, exact=FALSE)
+#' @references
+#' Cohen EB, Hostetler JA, Hallworth MT, Rushing CS, Sillett TS, Marra PP.
+#' Quantifying the strength of migratory connectivity.
+#' Methods in Ecology and Evolution. 2018 Mar;9(3):513-24.
+#' \doi{10.1111/2041-210X.12916}
 calc_route_mc <- function(rts, bf, exact=TRUE, ...) {
   # Using MigConnectivity::estPSI treating the routes as tracking data
+  stopifnot(is.logical(exact))
 
   ts <- lookup_timestep_sequence(bf, ...)
   origin_t <- ts[1]

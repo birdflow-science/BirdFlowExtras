@@ -2,12 +2,16 @@
 % Please edit documentation in R/calc_birdflow_mc.R
 \name{calc_birdflow_mc}
 \alias{calc_birdflow_mc}
-\title{Function to calculate migratory connectivity (MC) on a BirdFlow object}
+\title{Calculate migratory connectivity (MC) for a BirdFlow model.}
 \usage{
-calc_birdflow_mc(bf, ...)
+calc_birdflow_mc(bf, from_marginals = TRUE, ...)
 }
 \arguments{
 \item{bf}{A BirdFlow model}
+
+\item{from_marginals}{Use TRUE (the default) to sample from distributions derived from
+the fitted model parameters stored in the marginals. Use FALSE to use distributions
+derived directly from eBird Status and Trends when sampling starting locations.}
 
 \item{...}{
   Arguments passed on to \code{\link[BirdFlowR:lookup_timestep_sequence]{BirdFlowR::lookup_timestep_sequence}}
@@ -35,11 +39,26 @@ indicated by \code{...}
 \description{
 This function calculates migratory connectivity based on the transitions
 in a BirdFlowR model using the raster cells as regions.
-It relies on \code{MigConnectivity::calcMC()} to do the bulk of the work.
+It calculates the migratory connectivity metric MC as defined in Cohen 2018.
+MC represents an abundance-weighted correlation that is calculated between the origin
+locations and target locations, taking into account all grid transitions for the
+specified time period.
 }
 \examples{
+# load a BirdFlow model
 bf <- BirdFlowModels::amewoo
+# calculate migratory connectivity across the spring migration season:
 mc <- calc_birdflow_mc(bf, season = "prebreeding")
 print(mc)
-
+# calculate mc from week 10 to week 20:
+calc_birdflow_mc(bf, start=10, end=20)
+}
+\references{
+Cohen EB, Hostetler JA, Hallworth MT, Rushing CS, Sillett TS, Marra PP.
+Quantifying the strength of migratory connectivity.
+Methods in Ecology and Evolution. 2018 Mar;9(3):513-24.
+\doi{10.1111/2041-210X.12916}
+}
+\seealso{
+\code{\link[=calc_route_mc]{calc_route_mc()}}
 }
