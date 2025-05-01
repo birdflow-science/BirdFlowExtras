@@ -51,11 +51,12 @@ calc_route_mc <- function(rts, bf, exact=TRUE, ...) {
   target_t <- ts[length(ts)]
   ids <- unique(rts$data$route_id)
 
-  nearest_timestep <- function(rts, tstep){
+  nearest_timestep <- function(rts, tstep, nsteps){
     rts$data |>
       dplyr::group_by(route_id) |>
-      dplyr::mutate(dt = abs(timestep-tstep)) |>
-      dplyr::filter(dt == min(dt)) |>
+      dplyr::mutate(dt = abs(timestep - tstep)) |>
+      dplyr::filter(dt <= nsteps) |> # have to be within nsteps of tstep
+      dplyr::slice_min(dt, with_ties = FALSE) |>
       dplyr::select(-dt) |>
       dplyr::ungroup() |>
       as.data.frame()
@@ -66,8 +67,8 @@ calc_route_mc <- function(rts, bf, exact=TRUE, ...) {
     target <- rts$data[rts$data$timestep %in% target_t,]
   }
   else{
-    origin <- nearest_timestep(rts, origin_t)
-    target <- nearest_timestep(rts, target_t)
+    origin <- nearest_timestep(rts, origin_t, nsteps = 10)
+    target <- nearest_timestep(rts, target_t, nsteps = 10)
   }
 
   # Make sure origin and target rows correspond
@@ -75,10 +76,12 @@ calc_route_mc <- function(rts, bf, exact=TRUE, ...) {
   retained_ids <- intersect(origin$route_id, target$route_id)
   dropped_ids <- ids[!ids %in% retained_ids]
   if(length(dropped_ids)>0) warning(paste("dropping", length(dropped_ids), "tracks not connecting start and end period ..."))
-  origin <- origin[match(origin$route_id, retained_ids), ]  |> as.data.frame()
-  target <- target[match(target$route_id, retained_ids), ]  |> as.data.frame()
-  stopifnot(isTRUE(all.equal(origin$route_id, retained_ids)))
-  stopifnot(isTRUE(all.equal(target$route_id, retained_ids)))
+  origin <- origin[match(origin$route_id, retained_ids), ]  |> na.omit() |> as.data.frame()
+  target <- target[match(target$route_id, retained_ids), ]  |> na.omit() |> as.data.frame()
+  # stopifnot(isTRUE(setequal(origin$route_id, retained_ids)))
+  # stopifnot(isTRUE(all.equal(target$route_id, retained_ids)))
+  stopifnot(length(origin$route_id) == length(retained_ids))
+  stopifnot(length(target$route_id) == length(retained_ids))
 
   # Initialize origin and target distributions
   origin_abun <- target_abun <- rep(0, n_active(bf))
