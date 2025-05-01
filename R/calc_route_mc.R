@@ -42,7 +42,7 @@
 #' Quantifying the strength of migratory connectivity.
 #' Methods in Ecology and Evolution. 2018 Mar;9(3):513-24.
 #' \doi{10.1111/2041-210X.12916}
-calc_route_mc <- function(rts, bf, exact=TRUE, ...) {
+calc_route_mc <- function(rts, bf, exact=TRUE, delta_steps = 10, ...) {
   # Using MigConnectivity::estPSI treating the routes as tracking data
   stopifnot(is.logical(exact))
 
@@ -51,11 +51,11 @@ calc_route_mc <- function(rts, bf, exact=TRUE, ...) {
   target_t <- ts[length(ts)]
   ids <- unique(rts$data$route_id)
 
-  nearest_timestep <- function(rts, tstep, nsteps){
+  nearest_timestep <- function(rts, tstep, delta_steps){
     rts$data |>
       dplyr::group_by(route_id) |>
       dplyr::mutate(dt = abs(timestep - tstep)) |>
-      dplyr::filter(dt <= nsteps) |> # have to be within nsteps of tstep
+      dplyr::filter(dt <= delta_steps) |> # have to be within delta_steps of tstep
       dplyr::slice_min(dt, with_ties = FALSE) |>
       dplyr::select(-dt) |>
       dplyr::ungroup() |>
@@ -67,8 +67,8 @@ calc_route_mc <- function(rts, bf, exact=TRUE, ...) {
     target <- rts$data[rts$data$timestep %in% target_t,]
   }
   else{
-    origin <- nearest_timestep(rts, origin_t, nsteps = 10)
-    target <- nearest_timestep(rts, target_t, nsteps = 10)
+    origin <- nearest_timestep(rts, origin_t, delta_steps = 10)
+    target <- nearest_timestep(rts, target_t, delta_steps = 10)
   }
 
   # Make sure origin and target rows correspond
@@ -136,4 +136,3 @@ calc_route_mc <- function(rts, bf, exact=TRUE, ...) {
 
   return(MC)
 }
-
