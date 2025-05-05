@@ -62,7 +62,7 @@ When sampling a high number of routes from a BirdFlow model, the output of
 \examples{
 bf <- BirdFlowModels::amewoo
 # generate 100 synthetic routes
-rts <- route(bf, 100, season = "prebreeding")
+rts <- BirdFlowR::route(bf, 100, season = "prebreeding")
 # calculate MC across prebreeding season
 calc_route_mc(rts, bf, season="prebreeding")
 # calculate MC across a subset of weeks:

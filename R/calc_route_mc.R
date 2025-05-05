@@ -32,7 +32,7 @@
 #' @examples
 #' bf <- BirdFlowModels::amewoo
 #' # generate 100 synthetic routes
-#' rts <- route(bf, 100, season = "prebreeding")
+#' rts <- BirdFlowR::route(bf, 100, season = "prebreeding")
 #' # calculate MC across prebreeding season
 #' calc_route_mc(rts, bf, season="prebreeding")
 #' # calculate MC across a subset of weeks:
@@ -59,9 +59,9 @@ calc_route_mc <- function(rts, bf, exact = TRUE, delta_steps = 2, ...) {
   nearest_timestep <- function(rts, tstep, delta_steps) {
     rts$data |>
       dplyr::group_by(.data$route_id) |>
-      dplyr::mutate(dt = abs(.data$timestep - .data$tstep)) |>
+      dplyr::mutate(dt = abs(.data$timestep - tstep)) |>
       # must be within delta_steps of tstep:
-      dplyr::filter(.data$dt <= .data$delta_steps) |>
+      dplyr::filter(.data$dt <= delta_steps) |>
       dplyr::slice_min(.data$dt, with_ties = FALSE) |>
       dplyr::select(-.data$dt) |>
       dplyr::ungroup() |>
