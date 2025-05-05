@@ -2,40 +2,82 @@
 % Please edit documentation in R/calc_route_mc.R
 \name{calc_route_mc}
 \alias{calc_route_mc}
-\title{Calc migratory connectivity from BirdFlowR routes}
+\title{Calculate migratory connectivity from BirdFlowR routes.}
 \usage{
-calc_route_mc(rts, bf)
+calc_route_mc(rts, bf, exact = TRUE, delta_steps = 2, ...)
 }
 \arguments{
 \item{rts}{Output from \code{\link[BirdFlowR:route]{BirdFlowR::route()}}}
 
 \item{bf}{The BirdFlow model used to make \code{rts}}
+
+\item{exact}{logical. Whether to match route time steps exactly to period
+requested with \code{\link[BirdFlowR:lookup_timestep_sequence]{BirdFlowR::lookup_timestep_sequence()}} (TRUE)
+or use the route's closest available time steps (FALSE).}
+
+\item{delta_steps}{The number of time steps (weeks) you allow for the nearest
+timestep search when exact = FALSE. Default value is 2.}
+
+\item{...}{
+  Arguments passed on to \code{\link[BirdFlowR:lookup_timestep_sequence]{BirdFlowR::lookup_timestep_sequence}}
+  \describe{
+    \item{\code{season}}{a season name, season alias, or "all".  See
+\code{\link[BirdFlowR:lookup_season_timesteps]{lookup_season_timesteps()}} for options.}
+    \item{\code{start}}{The starting point in time specified as a
+timestep, character date, or date object.}
+    \item{\code{end}}{The ending point in time as a date or timestep.}
+    \item{\code{direction}}{Either "forward" or "backward" defaults to
+\code{"forward"} if not processing dates.  If using date input \code{direction} is
+optional and is only used to verify the direction implicit in the dates.}
+    \item{\code{season_buffer}}{Only used with \code{season} input. \code{season_buffer} is
+passed to \code{\link[BirdFlowR:lookup_season_timesteps]{lookup_season_timesteps()}} and defaults to 1; it is the number
+of timesteps to extend the season by at each end.}
+    \item{\code{n_steps}}{Alternative to \code{end}  The end will be \code{n_steps} away from
+\code{start} in \code{direction}; and the resulting sequence will have \code{n_step}
+transitions and \code{n_steps + 1}  timesteps.}
+  }}
 }
 \value{
 migratory connectivity estimated from the \code{rts} object.
 }
 \description{
-\strong{WARNING} this function is experimental and new and likely to change
-a bunch.
+This function calculates migratory connectivity based on sample of routes
+objects sampled either from a BirdFlowR model or from observational track
+data.
 }
 \details{
-Currently, it assumes that all the routes start and end at the same
-timestep and so uses the first and last timestep of the first route as the
-starting and ending timesteps and then calculates the migratory connectivity
-between those timesteps across all routes, dropping routes that don't
-have both timesteps.
+It calculates the migratory connectivity metric MC as defined in Cohen 2018.
+MC represents an abundance-weighted correlation that is calculated between
+the origin locations and target locations,
+taking into account all grid transitions for the specified time period.
 
-It treats the routes as "Telemetry" information when calling
-\code{MigConnectivity} functions.
+The route implementation does not correct for spatial sampling imbalances
+of the provided routes,
+i.e. the transition matrix is calculated directly from the route transitions.
 
-Current process is to call \code{MigConnectivity::estPsi} internally to calculate
-the transition probabilities needed to calculate \code{MC}.
-This step is really slow and then pass the result to \code{calcMC}.
-
-It might make sense to instead call  \code{estMC} which I think would perform
-both steps at once and output uncertainty.
-
-Alternatively, we could see if we can call a more efficient function to
-calculate the transitions probabilities as \code{estPsi} is doing a lot of
-work to calculate uncertainties that aren't used with the current process.
+When sampling a high number of routes from a BirdFlow model, the output of
+\code{\link[=calc_route_mc]{calc_route_mc()}} will become asymptotically identical to the output of
+\code{\link[=calc_birdflow_mc]{calc_birdflow_mc()}}.
+}
+\examples{
+bf <- BirdFlowModels::amewoo
+# generate 100 synthetic routes
+rts <- BirdFlowR::route(bf, 100, season = "prebreeding")
+# calculate MC across prebreeding season
+calc_route_mc(rts, bf, season="prebreeding")
+# calculate MC across a subset of weeks:
+calc_route_mc(rts, bf, start=10, end=20)
+# set exact to false to not enforce exact matches of route timestamps and
+# requested start and end weeks (in this example end week 30 is after the
+# last timestamp of the input routes):
+calc_route_mc(rts, bf, start=10, end=30, exact=FALSE)
+}
+\references{
+Cohen EB, Hostetler JA, Hallworth MT, Rushing CS, Sillett TS, Marra PP.
+Quantifying the strength of migratory connectivity.
+Methods in Ecology and Evolution. 2018 Mar;9(3):513-24.
+\doi{10.1111/2041-210X.12916}
+}
+\seealso{
+\code{\link[=calc_birdflow_mc]{calc_birdflow_mc()}}
 }
