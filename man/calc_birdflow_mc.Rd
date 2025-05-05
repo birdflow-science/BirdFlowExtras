@@ -9,9 +9,10 @@ calc_birdflow_mc(bf, from_marginals = TRUE, ...)
 \arguments{
 \item{bf}{A BirdFlow model}
 
-\item{from_marginals}{Use TRUE (the default) to sample from distributions derived from
-the fitted model parameters stored in the marginals. Use FALSE to use distributions
-derived directly from eBird Status and Trends when sampling starting locations.}
+\item{from_marginals}{Use TRUE (the default) to sample from distributions
+derived from the fitted model parameters stored in the marginals.
+Use FALSE to use distributions derived directly from eBird Status and Trends
+when sampling starting locations.}
 
 \item{...}{
   Arguments passed on to \code{\link[BirdFlowR:lookup_timestep_sequence]{BirdFlowR::lookup_timestep_sequence}}
@@ -40,9 +41,9 @@ indicated by \code{...}
 This function calculates migratory connectivity based on the transitions
 in a BirdFlowR model using the raster cells as regions.
 It calculates the migratory connectivity metric MC as defined in Cohen 2018.
-MC represents an abundance-weighted correlation that is calculated between the origin
-locations and target locations, taking into account all grid transitions for the
-specified time period.
+MC represents an abundance-weighted correlation that is calculated between
+the origin locations and target locations, taking into account all grid
+transitions for the specified time period.
 }
 \examples{
 # load a BirdFlow model

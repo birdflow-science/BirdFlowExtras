@@ -23,7 +23,8 @@ Suggests:
 Imports:
     BirdFlowR,
     MigConnectivity,
-    sf
+    sf, 
+    rlang
 Remotes:
     birdflow-science/BirdFlowModels,
     birdflow-science/BirdFlowR,

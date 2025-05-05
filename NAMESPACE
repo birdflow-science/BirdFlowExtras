@@ -3,3 +3,4 @@
 export(calc_birdflow_mc)
 export(calc_route_mc)
 import(BirdFlowR)
+importFrom(rlang,.data)

@@ -9,7 +9,7 @@ bf_msg <- function(..., sep = "") {
   }
 }
 
-# Conditionally supress messages in code called from BirdFlowExtras based
+# Conditionally suppress messages in code called from BirdFlowExtras based
 # on BirdFlowR::birdflow_options("verbose")
 bf_suppress_msg <- function(exp) {
   verbose <- birdflow_options("verbose")

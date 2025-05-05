@@ -4,7 +4,7 @@
 \alias{calc_route_mc}
 \title{Calculate migratory connectivity from BirdFlowR routes.}
 \usage{
-calc_route_mc(rts, bf, exact = TRUE, ...)
+calc_route_mc(rts, bf, exact = TRUE, delta_steps = 2, ...)
 }
 \arguments{
 \item{rts}{Output from \code{\link[BirdFlowR:route]{BirdFlowR::route()}}}
@@ -14,6 +14,9 @@ calc_route_mc(rts, bf, exact = TRUE, ...)
 \item{exact}{logical. Whether to match route time steps exactly to period
 requested with \code{\link[BirdFlowR:lookup_timestep_sequence]{BirdFlowR::lookup_timestep_sequence()}} (TRUE)
 or use the route's closest available time steps (FALSE).}
+
+\item{delta_steps}{The number of time steps (weeks) you allow for the nearest
+timestep search when exact = FALSE. Default value is 2.}
 
 \item{...}{
   Arguments passed on to \code{\link[BirdFlowR:lookup_timestep_sequence]{BirdFlowR::lookup_timestep_sequence}}
@@ -39,17 +42,18 @@ migratory connectivity estimated from the \code{rts} object.
 }
 \description{
 This function calculates migratory connectivity based on sample of routes
-objects sampled either from a BirdFlowR model or from observational track data.
+objects sampled either from a BirdFlowR model or from observational track
+data.
 }
 \details{
 It calculates the migratory connectivity metric MC as defined in Cohen 2018.
-MC represents an abundance-weighted correlation that is calculated between the origin
-locations and target locations, taking into account all grid transitions for the
-specified time period.
+MC represents an abundance-weighted correlation that is calculated between
+the origin locations and target locations,
+taking into account all grid transitions for the specified time period.
 
-The route implementation does not correct for spatial sampling inbalances of the
-provided routes, i.e. the transition matrix is calculated directly from the route
-transitions.
+The route implementation does not correct for spatial sampling imbalances
+of the provided routes,
+i.e. the transition matrix is calculated directly from the route transitions.
 
 When sampling a high number of routes from a BirdFlow model, the output of
 \code{\link[=calc_route_mc]{calc_route_mc()}} will become asymptotically identical to the output of
@@ -64,8 +68,8 @@ calc_route_mc(rts, bf, season="prebreeding")
 # calculate MC across a subset of weeks:
 calc_route_mc(rts, bf, start=10, end=20)
 # set exact to false to not enforce exact matches of route timestamps and
-# requested start and end weeks (in this example end week 30 is after the last
-# timestamp of the input routes):
+# requested start and end weeks (in this example end week 30 is after the
+# last timestamp of the input routes):
 calc_route_mc(rts, bf, start=10, end=30, exact=FALSE)
 }
 \references{
