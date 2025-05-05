@@ -78,12 +78,10 @@ calc_route_mc <- function(rts, bf, exact=TRUE, delta_steps = 2, ...) {
   retained_ids <- intersect(origin$route_id, target$route_id)
   dropped_ids <- ids[!ids %in% retained_ids]
   if(length(dropped_ids)>0) warning(paste("dropping", length(dropped_ids), "tracks not connecting start and end period ...", length(retained_ids), "tracks remaining"))
-  origin <- origin[match(origin$route_id, retained_ids), ]  |> na.omit() |> as.data.frame()
-  target <- target[match(target$route_id, retained_ids), ]  |> na.omit() |> as.data.frame()
-  # stopifnot(isTRUE(setequal(origin$route_id, retained_ids)))
-  # stopifnot(isTRUE(all.equal(target$route_id, retained_ids)))
-  stopifnot(length(origin$route_id) == length(retained_ids))
-  stopifnot(length(target$route_id) == length(retained_ids))
+  origin <- origin[origin$route_id %in% retained_ids, ] |> as.data.frame()
+  target <- target[target$route_id %in% retained_ids, ] |> as.data.frame()
+  stopifnot(isTRUE(setequal(origin$route_id, retained_ids)))
+  stopifnot(isTRUE(all.equal(target$route_id, retained_ids)))
 
 
   # Initialize origin and target distributions
