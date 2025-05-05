@@ -21,6 +21,8 @@
 #' @param exact logical. Whether to match route time steps exactly to period
 #' requested with [BirdFlowR::lookup_timestep_sequence()] (TRUE)
 #' or use the route's closest available time steps (FALSE).
+#' @param delta_steps The number of time steps (weeks) you allow for the nearest
+#' timestep search when exact = FALSE. Default value is 2.
 #' @inheritDotParams BirdFlowR::lookup_timestep_sequence -x
 #' @return migratory connectivity estimated from the `rts` object.
 #' @export
@@ -42,7 +44,7 @@
 #' Quantifying the strength of migratory connectivity.
 #' Methods in Ecology and Evolution. 2018 Mar;9(3):513-24.
 #' \doi{10.1111/2041-210X.12916}
-calc_route_mc <- function(rts, bf, exact=TRUE, delta_steps = 10, ...) {
+calc_route_mc <- function(rts, bf, exact=TRUE, delta_steps = 2, ...) {
   # Using MigConnectivity::estPSI treating the routes as tracking data
   stopifnot(is.logical(exact))
 
@@ -67,21 +69,22 @@ calc_route_mc <- function(rts, bf, exact=TRUE, delta_steps = 10, ...) {
     target <- rts$data[rts$data$timestep %in% target_t,]
   }
   else{
-    origin <- nearest_timestep(rts, origin_t, delta_steps = 10)
-    target <- nearest_timestep(rts, target_t, delta_steps = 10)
+    origin <- nearest_timestep(rts, origin_t, delta_steps)
+    target <- nearest_timestep(rts, target_t, delta_steps)
   }
 
   # Make sure origin and target rows correspond
   # Not necessary for synthetic routes because likely needed for real routes
   retained_ids <- intersect(origin$route_id, target$route_id)
   dropped_ids <- ids[!ids %in% retained_ids]
-  if(length(dropped_ids)>0) warning(paste("dropping", length(dropped_ids), "tracks not connecting start and end period ..."))
+  if(length(dropped_ids)>0) warning(paste("dropping", length(dropped_ids), "tracks not connecting start and end period ...", length(retained_ids), "tracks remaining"))
   origin <- origin[match(origin$route_id, retained_ids), ]  |> na.omit() |> as.data.frame()
   target <- target[match(target$route_id, retained_ids), ]  |> na.omit() |> as.data.frame()
   # stopifnot(isTRUE(setequal(origin$route_id, retained_ids)))
   # stopifnot(isTRUE(all.equal(target$route_id, retained_ids)))
   stopifnot(length(origin$route_id) == length(retained_ids))
   stopifnot(length(target$route_id) == length(retained_ids))
+
 
   # Initialize origin and target distributions
   origin_abun <- target_abun <- rep(0, n_active(bf))
@@ -95,7 +98,7 @@ calc_route_mc <- function(rts, bf, exact=TRUE, delta_steps = 10, ...) {
   # Calculate distance matrices
   dist <- great_circle_distances(bf)  # all active cells
 
-  # matrix product to have all compbinations for two samples for origin_abun
+  # matrix product to have all combinations for two samples for origin_abun
   # note that this outer product remains normalized, because origin_abun is normalized
   origin_abun_prod <- origin_abun %*% t(origin_abun)
   # mu_D effectively equals weighted.mean(origin_dist, origin_abun_prod)
